@@ -1,32 +1,26 @@
-name: Build and Upload Artifact
+name: Merge on Specific User Review Comment
 
-on: [push]
+on:
+  pull_request_review_comment:
+    types: [created, edited]
 
 jobs:
-  build:
+  check-review-comment:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Check if comment is from specific user
+        id: check_user
+        run: |
+          COMMENT_USER=$(jq -r '.comment.user.login' < $GITHUB_EVENT_PATH)
+          if [[ "$COMMENT_USER" == "trustedReviewer1" || "$COMMENT_USER" == "trustedReviewer2" ]]; then
+            echo "::set-output name=trigger::true"
+          else
+            echo "::set-output name=trigger::false"
+          fi
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4.3.3
-        with:
-          name: build-artifact
-          path: path/to/build  # Adjust the path to your build directory or file
-          if-no-files-found: warn
-          retention-days: 30
-          compression-level: 6
-          overwrite: false
+      - name: Perform action if specific user commented
+        if: steps.check_user.outputs.trigger == 'true'
+        run: echo "Performing action because a trusted reviewer commented!"
