@@ -1,5 +1,5 @@
 name: Merge on Specific User Review Comment
-
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   pull_request_review_comment:
     types: [created, edited]
@@ -20,7 +20,3 @@ jobs:
           else
             echo "::set-output name=trigger::false"
           fi
-
-      - name: Perform action if specific user commented
-        if: steps.check_user.outputs.trigger == 'true'
-        run: echo "Performing action because a trusted reviewer commented!"
