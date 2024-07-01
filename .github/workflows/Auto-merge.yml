@@ -35,11 +35,9 @@ jobs:
           echo "Checking conditions..."
           echo "After conditions, USER_IN_LIST=${USER_IN_LIST}"
           echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
-
           echo "draft: ${{ github.event.pull_request.draft }}"
-          echo "merge: ${{ github.event.pull_request.mergeable_state }}"
           
-          if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ] && [ "${{ github.event.pull_request.mergeable_state }}" = "clean" ]; then
+          if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
             echo "AUTO_MERGE=true"
             echo "True"
@@ -47,7 +45,6 @@ jobs:
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
             echo "false"
           fi
-          echo "AUTO_MERGE=${AUTO_MERGE}"
 
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
