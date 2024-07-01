@@ -53,7 +53,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}  # Use the GITHUB_TOKEN from the default GitHub Actions secret
           allowed-author: "dependabot[bot], iyadKhamis"
-          merge-method: MERGE
+          merge-method: merge
 
       - name: No Merge Due to Conditions Not Met
         if: ${{ env.AUTO_MERGE == 'false' }}
