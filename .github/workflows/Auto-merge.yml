@@ -1,4 +1,4 @@
-name: Automerge on specific users PRs
+name: Enable automerge on specific users PRs and dependabot PRs
 
 run-name: ${{ github.actor }} is testing auto-merging 🚀
 
@@ -20,6 +20,7 @@ jobs:
         id: check_user
         run: |
           USERS_JSON='["user1", "user2", "user3", "dependabot[bot]"]'
+          echo "USERS_JSON=${USERS_JSON}"
           if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
             echo "USER_IN_LIST=true" >> $GITHUB_ENV
           else
