@@ -41,6 +41,15 @@ jobs:
             echo "false"
           fi
 
+      - name: Check Token Availability
+        run: |
+          if [ -z "${{ secrets.PERSONAL_ACCESS_TOKEN }}" ]; then
+            echo "PERSONAL_ACCESS_TOKEN is not set."
+            exit 1
+          else
+            echo "PERSONAL_ACCESS_TOKEN is set."
+          fi
+
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
         uses: daneden/enable-automerge-action@v1
