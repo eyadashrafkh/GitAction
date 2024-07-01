@@ -1,4 +1,4 @@
-name: Auto-merge PRs
+name: Auto-merge PRs review
 
 on:
   pull_request_review:
