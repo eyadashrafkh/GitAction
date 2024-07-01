@@ -35,7 +35,7 @@ jobs:
           echo "Checking conditions..."          
           if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
-            echo "True, ${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+            echo "True"
           else
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
             echo "false"
@@ -48,6 +48,17 @@ jobs:
             exit 1
           else
             echo "PERSONAL_ACCESS_TOKEN is set."
+          fi
+
+      - name: Test Token with API Call
+        run: |
+          response=$(curl -s -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" https://api.github.com/user)
+          echo "$response"
+          if echo "$response" | grep -q '"login":'; then
+            echo "Token is working."
+          else
+            echo "Token is not working."
+            exit 1
           fi
 
       - name: Auto Merge Bot
