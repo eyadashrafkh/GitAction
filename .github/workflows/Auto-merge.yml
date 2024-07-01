@@ -19,6 +19,7 @@ jobs:
           echo "Actor: ${{ github.actor }}"
           echo "PR URL: ${{ github.event.pull_request.html_url }}"
           echo "Token: ${{ secrets.GITHUB_TOKEN }}"
+          echo "Event triggered by ${{ github.actor }}"
         
       # - name: Approve a PR
       #   run: gh pr review --approve "$PR_URL"
