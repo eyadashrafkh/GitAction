@@ -66,3 +66,14 @@ jobs:
         run: |
           echo "Merge due to conditions met. User is in the list and PR is ready for merge."
           echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
+
+      - name: Confirm Auto-Merge Status
+        if: ${{ env.AUTO_MERGE == 'true' }}
+        run: |
+          PR_STATUS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.mergeable')
+          if [ "$PR_STATUS" = "true" ]; then
+            echo "PR is ready to be merged."
+          else
+            echo "PR is not ready for merging."
+            exit 1
+          fi
