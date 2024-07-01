@@ -32,14 +32,9 @@ jobs:
       - name: Set auto-merge conditions
         id: auto_merge_conditions
         run: |
-          echo "Checking conditions..."
-          echo "After conditions, USER_IN_LIST=${USER_IN_LIST}"
-          echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
-          echo "draft: ${{ github.event.pull_request.draft }}"
-          
+          echo "Checking conditions..."          
           if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
-            echo "AUTO_MERGE=true"
             echo "True"
           else
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
@@ -48,17 +43,20 @@ jobs:
 
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
-        uses: casassg/auto-merge-bot@v0.3.6
+        uses: daneden/enable-automerge-action@v1
         with:
-          # Optional: The path to the root folder where it should look for code owners
-          cwd: ./
-          # Optional: The merge strategy to use: 'merge', 'squash', or 'rebase'
-          merge_method: merge  # You can change this to 'squash' or 'rebase' as needed
-          # Optional: Whether to assign or not a reviewer
-          assign_reviewer: false  # Set to `true` if you want to assign a reviewer
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure GITHUB_TOKEN is provided
+          # A personal access token that you have generated and saved in the
+          # repo or org’s encrypted secrets
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
+          # The name of the PR author to enable automerge for
+          # Defaults to dependabot[bot]
+          allowed-author: "dependabot[bot], iyadKhamis"
+
+          # Allowed values: MERGE | SQUASH | REBASE
+          # Defaults to MERGE
+          merge-method: MERGE
+          
       - name: No Merge Due to Conditions Not Met
         if: ${{ env.AUTO_MERGE == 'false' }}
         run: |
