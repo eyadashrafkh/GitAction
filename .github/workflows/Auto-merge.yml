@@ -26,16 +26,18 @@ jobs:
           else
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
           fi
-          echo "After conditions"
+          echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
 
       - name: Set auto-merge conditions
         id: auto_merge_conditions
         run: |
-          if [ "${{ env.USER_IN_LIST }}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
+          echo "Checking conditions..."
+          if [ "${{ env.USER_IN_LIST }}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ] && [ "${{ github.event.pull_request.mergeable_state }}" = "clean" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
           else
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
           fi
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
 
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
@@ -48,12 +50,16 @@ jobs:
           # Optional: Whether to assign or not a reviewer
           assign_reviewer: false  # Set to `true` if you want to assign a reviewer
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure GITHUB_TOKEN is provided
 
       - name: No Merge Due to Conditions Not Met
         if: ${{ env.AUTO_MERGE == 'false' }}
-        run: echo "No merge due to conditions not met. User is either not in the list or PR is a draft."
+        run: |
+          echo "No merge due to conditions not met. User is either not in the list, PR is a draft, or PR is not in a clean state."
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
 
       - name: Merge Due to Conditions Met
         if: ${{ env.AUTO_MERGE == 'true' }}
-        run: echo "No merge due to conditions not met. User is either not in the list or PR is a draft."
+        run: |
+          echo "Merge due to conditions met. User is in the list and PR is ready for merge."
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
