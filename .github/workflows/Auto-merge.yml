@@ -26,7 +26,6 @@ jobs:
           else
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
           fi
-          echo "After Condition"
 
       - name: Set auto-merge conditions
         id: auto_merge_conditions
@@ -36,7 +35,6 @@ jobs:
           else
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
           fi
-          echo "After Condition"
 
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
@@ -54,3 +52,7 @@ jobs:
       - name: No Merge Due to Conditions Not Met
         if: ${{ env.AUTO_MERGE == 'false' }}
         run: echo "No merge due to conditions not met. User is either not in the list or PR is a draft."
+        
+      - name: Merge Due to Conditions Met
+        if: ${{ env.AUTO_MERGE == 'true' }}
+        run: echo "Merge due to conditions met. User is in the list."
