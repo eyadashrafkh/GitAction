@@ -14,6 +14,6 @@ jobs:
       - name: Auto merge PR
         uses: pascalgn/automerge-action@v0.15.0
         with:
-          merge-method: squash  # Options: merge, squash, rebase
+          merge-method: merge  # Options: merge, squash, rebase
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
