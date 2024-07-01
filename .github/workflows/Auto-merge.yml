@@ -9,7 +9,7 @@ on: pull_request_target
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ contains(fromJson('["dependabot[bot]", "octocat", "iyadKhamis", "eyadashrafkh", "adham404"]'), github.actor) }}
+    if: ${{ contains(fromJson('["dependabot[bot]", "iyadKhamis", "eyadashrafkh", "adham404"]'), github.actor) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
