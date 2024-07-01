@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   auto_merge:
+    permissions: write-all
     runs-on: ubuntu-latest
     if: ${{ github.event.review.state == 'approved' && contains(fromJson('["dependabot[bot]", "octocat", "iyadKhamis", "eyadashrafkh", "adham404"]'), github.actor) }}
     steps:
