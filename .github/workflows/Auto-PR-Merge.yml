@@ -1,4 +1,4 @@
-name: Enable automerge on specific users' PRs and dependabot PRs
+name: Enable automerge on specific users PRs and dependabot PRs
 run-name: ${{ github.actor }} is testing auto-merging 🚀
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   automerge:
-    name: Enable automerge on specific users' PRs and dependabot PRs
+    name: Enable automerge on specific users PRs and dependabot PRs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
           else
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
 
-      - name: Enable automerge on specific users' PRs
+      - name: Enable automerge on specific users PRs
         if: ${{ env.USER_IN_LIST == 'true' && github.event.pull_request.draft == false && github.event.pull_request.mergeable_state == 'clean' }}
         uses: actions/github-script@v6
         with:
