@@ -23,31 +23,29 @@ jobs:
           echo "USERS_JSON=${USERS_JSON}"
           if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
             echo "USER_IN_LIST=true" >> $GITHUB_ENV
-            echo "USER_IN_LIST=true"
             echo "True"
           else
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
-            echo "USER_IN_LIST=false"
             echo "False"
           fi
-          echo "After conditions, USER_IN_LIST=${USER_IN_LIST}"
 
       - name: Set auto-merge conditions
         id: auto_merge_conditions
         run: |
           echo "Checking conditions..."
           echo "After conditions, USER_IN_LIST=${USER_IN_LIST}"
-          if [ "${{ env.USER_IN_LIST }}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ] && [ "${{ github.event.pull_request.mergeable_state }}" = "clean" ]; then
+          echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
+
+          echo "draft: ${{ github.event.pull_request.draft }}"
+          echo "merge: ${{ github.event.pull_request.mergeable_state }}"
+          
+          if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ] && [ "${{ github.event.pull_request.mergeable_state }}" = "clean" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
             echo "AUTO_MERGE=true"
             echo "True"
           else
-            echo "False USER_IN_LIST=${{ env.USER_IN_LIST }}"
-            echo "False USER_IN_LIST=${env.USER_IN_LIST}"
-            echo "False USER_IN_LIST=${USER_IN_LIST}"
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
-            echo "AUTO_MERGE=false"
-            
+            echo "false"
           fi
           echo "AUTO_MERGE=${AUTO_MERGE}"
 
