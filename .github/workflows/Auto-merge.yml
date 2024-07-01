@@ -38,7 +38,7 @@ jobs:
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
             echo "True"
           else
-            echo "False"
+            echo "False USER_IN_LIST=${{ env.USER_IN_LIST }}"
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
           fi
           echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
