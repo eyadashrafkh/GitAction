@@ -1,79 +1,79 @@
-# name: Enable automerge on specific users PRs and dependabot PRs
+name: Enable automerge on specific users PRs and dependabot PRs
 
-# run-name: ${{ github.actor }} is testing auto-merging 🚀
+run-name: ${{ github.actor }} is testing auto-merging 🚀
 
-# on:
-#   pull_request:
-#     types: [opened, synchronize, ready_for_review]
-#     paths-ignore:
-#       - .github/workflows/your-workflow-file.yml  # Replace with your actual workflow file name
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    paths-ignore:
+      - .github/workflows/your-workflow-file.yml  # Replace with your actual workflow file name
 
-# jobs:
-#   automerge:
-#     name: Enable automerge on specific users PRs and dependabot PRs
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
+jobs:
+  automerge:
+    name: Enable automerge on specific users PRs and dependabot PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-#       - name: Check if PR Creator is in the List of Users
-#         id: check_user
-#         run: |
-#           USERS_JSON='["user1", "user2", "user3", "dependabot[bot]", "iyadKhamis"]'
-#           echo "USERS_JSON=${USERS_JSON}"
-#           if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
-#             echo "USER_IN_LIST=true" >> $GITHUB_ENV
-#             echo "True"
-#           else
-#             echo "USER_IN_LIST=false" >> $GITHUB_ENV
-#             echo "False"
-#           fi
+      - name: Check if PR Creator is in the List of Users
+        id: check_user
+        run: |
+          USERS_JSON='["user1", "user2", "user3", "dependabot[bot]", "iyadKhamis"]'
+          echo "USERS_JSON=${USERS_JSON}"
+          if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
+            echo "USER_IN_LIST=true" >> $GITHUB_ENV
+            echo "True"
+          else
+            echo "USER_IN_LIST=false" >> $GITHUB_ENV
+            echo "False"
+          fi
 
-#       - name: Set auto-merge conditions
-#         id: auto_merge_conditions
-#         run: |
-#           echo "Checking conditions..."          
-#           if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
-#             echo "AUTO_MERGE=true" >> $GITHUB_ENV
-#             echo "True"
-#           else
-#             echo "AUTO_MERGE=false" >> $GITHUB_ENV
-#             echo "false"
-#           fi
+      - name: Set auto-merge conditions
+        id: auto_merge_conditions
+        run: |
+          echo "Checking conditions..."          
+          if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
+            echo "AUTO_MERGE=true" >> $GITHUB_ENV
+            echo "True"
+          else
+            echo "AUTO_MERGE=false" >> $GITHUB_ENV
+            echo "false"
+          fi
 
-#       - name: Check GITHUB_TOKEN Permissions
-#         run: |
-#           curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check GITHUB_TOKEN Permissions
+        run: |
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-#       - name: Auto Merge Bot
-#         if: ${{ env.AUTO_MERGE == 'true' }}
-#         uses: daneden/enable-automerge-action@v1
-#         with:
-#           github-token: ${{ secrets.GITHUB_TOKEN }}  # Use the GITHUB_TOKEN from the default GitHub Actions secret
-#           allowed-author: "dependabot[bot], iyadKhamis"
-#           merge-method: merge
+      - name: Auto Merge Bot
+        if: ${{ env.AUTO_MERGE == 'true' }}
+        uses: daneden/enable-automerge-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Use the GITHUB_TOKEN from the default GitHub Actions secret
+          allowed-author: "dependabot[bot], iyadKhamis"
+          merge-method: merge
 
-#       - name: No Merge Due to Conditions Not Met
-#         if: ${{ env.AUTO_MERGE == 'false' }}
-#         run: |
-#           echo "No merge due to conditions not met. User is either not in the list, PR is a draft, or PR is not in a clean state."
-#           echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
+      - name: No Merge Due to Conditions Not Met
+        if: ${{ env.AUTO_MERGE == 'false' }}
+        run: |
+          echo "No merge due to conditions not met. User is either not in the list, PR is a draft, or PR is not in a clean state."
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
 
-#       - name: Merge Due to Conditions Met
-#         if: ${{ env.AUTO_MERGE == 'true' }}
-#         run: |
-#           echo "Merge due to conditions met. User is in the list and PR is ready for merge."
-#           echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
+      - name: Merge Due to Conditions Met
+        if: ${{ env.AUTO_MERGE == 'true' }}
+        run: |
+          echo "Merge due to conditions met. User is in the list and PR is ready for merge."
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
 
-#       - name: Confirm Auto-Merge Status
-#         if: ${{ env.AUTO_MERGE == 'true' }}
-#         run: |
-#           PR_STATUS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.mergeable')
-#           if [ "$PR_STATUS" = "true" ]; then
-#             echo "PR is ready to be merged."
-#           else
-#             echo "PR is not ready for merging."
-#             exit 1
-#           fi
+      - name: Confirm Auto-Merge Status
+        if: ${{ env.AUTO_MERGE == 'true' }}
+        run: |
+          PR_STATUS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r '.mergeable')
+          if [ "$PR_STATUS" = "true" ]; then
+            echo "PR is ready to be merged."
+          else
+            echo "PR is not ready for merging."
+            exit 1
+          fi
