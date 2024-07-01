@@ -41,23 +41,23 @@ jobs:
             echo "false"
           fi
 
-      - name: Check Token Availability
+      - name: Check GITHUB_TOKEN Availability
         run: |
-          if [ -z "${{ secrets.GITHUB_TOKEN  }}" ]; then
-            echo "GITHUB_TOKEN  is not set."
+          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
+            echo "GITHUB_TOKEN is not set."
             exit 1
           else
-            echo "GITHUB_TOKEN  is set."
+            echo "GITHUB_TOKEN is set."
           fi
 
-      - name: Test Token with API Call
+      - name: Test GITHUB_TOKEN with API Call
         run: |
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN  }}" https://api.github.com/user)
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/user)
           echo "$response"
           if echo "$response" | grep -q '"login":'; then
-            echo "Token is working."
+            echo "GITHUB_TOKEN is working."
           else
-            echo "Token is not working."
+            echo "GITHUB_TOKEN is not working."
             exit 1
           fi
 
@@ -65,10 +65,10 @@ jobs:
         if: ${{ env.AUTO_MERGE == 'true' }}
         uses: daneden/enable-automerge-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN  }}  # Use your personal access token from repository secrets
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Use the GITHUB_TOKEN from the default GitHub Actions secret
           allowed-author: "dependabot[bot], iyadKhamis"
           merge-method: MERGE
-          
+
       - name: No Merge Due to Conditions Not Met
         if: ${{ env.AUTO_MERGE == 'false' }}
         run: |
