@@ -1,0 +1,50 @@
+name: Enable automerge on specific users PRs and dependabot PRs
+run-name: ${{ github.actor }} is testing auto-merging 🚀
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+jobs:
+  automerge:
+    name: Enable automerge on specific users PRs and dependabot PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check if PR Creator is in the List of Users
+        run: |
+          USERS_JSON='["user1", "user2", "user3", "dependabot[bot]"]'
+          if echo $USERS_JSON | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
+            echo "USER_IN_LIST=true" >> $GITHUB_ENV
+          else
+            echo "USER_IN_LIST=false" >> $GITHUB_ENV
+
+      - name: Enable automerge on specific users PRs
+        if: ${{ env.USER_IN_LIST == 'true' && github.event.pull_request.draft == false && github.event.pull_request.mergeable_state == 'clean' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { GITHUB_TOKEN } = process.env;
+            const { Octokit } = require("@octokit/rest");
+            const octokit = new Octokit({
+              auth: GITHUB_TOKEN
+            });
+            await octokit.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              merge_method: 'merge'
+            });
+            await octokit.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `This PR by @${{ github.actor }} has been automatically merged. Thank you for your contribution!`
+            });
+          env:
+            GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: No Merge Due to Unknown User
+        if: ${{ env.USER_IN_LIST == 'false' }}
+        run: echo "No merge due to unknown user: ${{ github.actor }}"
