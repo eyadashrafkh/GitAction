@@ -28,7 +28,7 @@ jobs:
             echo "False"
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
           fi
-          echo "After conditions, USER_IN_LIST=${{ USER_IN_LIST }}"
+          echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
 
       - name: Set auto-merge conditions
         id: auto_merge_conditions
@@ -41,7 +41,7 @@ jobs:
             echo "False"
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
           fi
-          echo "AUTO_MERGE=${{ AUTO_MERGE }}"
+          echo "AUTO_MERGE=${{ env.AUTO_MERGE }}"
 
       - name: Auto Merge Bot
         if: ${{ env.AUTO_MERGE == 'true' }}
