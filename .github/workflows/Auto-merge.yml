@@ -19,7 +19,7 @@ jobs:
       - name: Check if PR Creator is in the List of Users
         id: check_user
         run: |
-          USERS_JSON='["user1", "user2", "user3", "dependabot[bot]"]'
+          USERS_JSON='["user1", "user2", "user3", "dependabot[bot]", "iyadKhamis"]'
           echo "USERS_JSON=${USERS_JSON}"
           if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
             echo "USER_IN_LIST=true" >> $GITHUB_ENV
