@@ -19,6 +19,8 @@ jobs:
           echo "Actor: ${{ github.actor }}"
           echo "PR URL: ${{ github.event.pull_request.html_url }}"
           echo "Token: ${{ secrets.GITHUB_TOKEN }}"
+          echo "Token: ${{ secrets.PAT }}"
+          echo "Token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}"
         
       - name: Approve a PR
         run: gh pr review --approve "$PR_URL"
@@ -26,13 +28,13 @@ jobs:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Enable auto-merge for Dependabot PRs
+      - name: Enable auto-merge for PRs
         run: gh pr merge --auto --rebase "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Merge Pull Request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge ${{ github.event.pull_request.number }} --merge --admin
+      # - name: Merge Pull Request
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: gh pr merge ${{ github.event.pull_request.number }} --merge --admin
