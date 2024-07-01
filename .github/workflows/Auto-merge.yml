@@ -35,7 +35,7 @@ jobs:
           echo "Checking conditions..."          
           if [ "${USER_IN_LIST}" = "true" ] && [ "${{ github.event.pull_request.draft }}" = "false" ]; then
             echo "AUTO_MERGE=true" >> $GITHUB_ENV
-            echo "True"
+            echo "True, ${{ secrets.PERSONAL_ACCESS_TOKEN }}"
           else
             echo "AUTO_MERGE=false" >> $GITHUB_ENV
             echo "false"
