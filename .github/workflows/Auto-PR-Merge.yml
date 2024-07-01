@@ -1,5 +1,5 @@
 name: Enable automerge on specific users' PRs and dependabot PRs
-
+run-name: ${{ github.actor }} is testing auto-merging 🚀
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review]
