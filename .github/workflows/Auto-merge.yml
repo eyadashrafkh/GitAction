@@ -22,11 +22,11 @@ jobs:
           USERS_JSON='["user1", "user2", "user3", "dependabot[bot]", "iyadKhamis"]'
           echo "USERS_JSON=${USERS_JSON}"
           if echo "$USERS_JSON" | jq -e ".[] == \"${{ github.actor }}\"" >/dev/null; then
-            echo "True"
             echo "USER_IN_LIST=true" >> $GITHUB_ENV
+            echo "True"
           else
-            echo "False"
             echo "USER_IN_LIST=false" >> $GITHUB_ENV
+            echo "False"
           fi
           echo "After conditions, USER_IN_LIST=${{ env.USER_IN_LIST }}"
 
