@@ -20,10 +20,23 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
+      - name: Check for Java files
+        id: check_java_files
+        run: |
+          if [ -z "$(find . -name '*.java')" ]; then
+            echo "No Java files found."
+            echo "::set-output name=skip::true"
+          else
+            echo "Java files found."
+            echo "::set-output name=skip::false"
+          fi
+
       - name: Format Java code
+        if: steps.check_java_files.outputs.skip == 'false'
         run: java -jar tools/google-java-format-1.22.0-all-deps.jar -r $(find . -name '*.java')
 
       - name: Commit and push changes
+        if: steps.check_java_files.outputs.skip == 'false'
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
@@ -32,3 +45,7 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Skip message
+        if: steps.check_java_files.outputs.skip == 'true'
+        run: echo "No Java files to format. Action skipped."
