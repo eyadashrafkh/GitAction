@@ -1,1 +1,7 @@
-package JavaFiles;public class TestJavaFormat2 {public static void main(String[] args) {System.out.println("Hello, world!");}}
+package JavaFiles;
+
+public class TestJavaFormat2 {
+  public static void main(String[] args) {
+    System.out.println("Hello, world!");
+  }
+}
