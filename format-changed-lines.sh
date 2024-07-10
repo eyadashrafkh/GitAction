@@ -11,9 +11,9 @@ fi
 # Download Google Java Format
 curl -LJO https://github.com/google/google-java-format/releases/download/v1.22.0/google-java-format-1.22.0-all-deps.jar
 
-# Format each changed Java file
+# Format each changed Java file using AOSP style (4-space indentation)
 for FILE in $CHANGED_FILES; do
-  java -jar google-java-format-1.22.0-all-deps.jar --replace "$FILE"
+  java -jar google-java-format-1.22.0-all-deps.jar --aosp --replace "$FILE"
 done
 
 # Check if there are any changes to commit
