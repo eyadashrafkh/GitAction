@@ -1,5 +1,2 @@
-public class HelloWorld {
-  public static void main(String[] args) {
-    System.out.println("Hello, world!");
-  }
-}
+public class TestJavaFormat {
+    @SuppressWarnings("unused")    private static final String HELLO_WORLD = "Hello, world!";}
