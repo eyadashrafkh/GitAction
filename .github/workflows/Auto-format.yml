@@ -23,13 +23,14 @@ jobs:
       - name: Check for Java files
         id: check_java_files
         run: |
-          CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.java$' || true)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' || true)
           if [ -z "$CHANGED_FILES" ]; then
             echo "No Java files changed."
             echo "skip=true" >> $GITHUB_ENV
           else
             echo "Java files changed."
             echo "skip=false" >> $GITHUB_ENV
+            echo "changed_files=$CHANGED_FILES" >> $GITHUB_ENV
           fi
 
       - name: Ensure tools directory exists
@@ -52,8 +53,7 @@ jobs:
       - name: Run Google Java Format
         if: env.skip == 'false'
         run: |
-          CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.java$' || true)
-          for FILE in $CHANGED_FILES; do
+          for FILE in ${{ env.changed_files }}; do
             echo "Formatting $FILE"
             java -jar tools/google-java-format-1.22.0-all-deps.jar --aosp $FILE
           done
