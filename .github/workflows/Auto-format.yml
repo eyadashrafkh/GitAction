@@ -7,15 +7,15 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  format:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '11'
@@ -23,17 +23,31 @@ jobs:
       - name: Check for Java files
         id: check_java_files
         run: |
-          if [ -z "$(find . -name '*.java')" ]; then
-            echo "No Java files found."
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.java$' || true)
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No Java files changed."
             echo "skip=true" >> $GITHUB_ENV
           else
-            echo "Java files found."
+            echo "Java files changed."
             echo "skip=false" >> $GITHUB_ENV
           fi
 
-      - name: Format Java code
+      - name: Ensure tools directory exists
+        run: mkdir -p tools
+
+      - name: Download Google Java Format JAR
+        if: env.skip == 'false' && ! -f tools/google-java-format-1.22.0-all-deps.jar
+        run: |
+          curl -L -o tools/google-java-format-1.22.0-all-deps.jar https://repo1.maven.org/maven2/com/google/googlejavaformat/google-java-format/1.22.0/google-java-format-1.22.0-all-deps.jar
+
+      - name: Run Google Java Format
         if: env.skip == 'false'
-        run: java -jar tools/google-java-format-1.22.0-all-deps.jar -r $(find . -name '*.java')
+        run: |
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.java$' || true)
+          for FILE in $CHANGED_FILES; do
+            echo "Formatting $FILE"
+            java -jar tools/google-java-format-1.22.0-all-deps.jar --aosp $FILE
+          done
 
       - name: Commit and push changes
         if: env.skip == 'false'
@@ -45,7 +59,7 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Skip message
         if: env.skip == 'true'
         run: echo "No Java files to format. Action skipped."
