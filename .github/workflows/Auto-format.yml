@@ -35,8 +35,17 @@ jobs:
       - name: Ensure tools directory exists
         run: mkdir -p tools
 
+      - name: Check if Google Java Format JAR exists
+        id: check_format_jar
+        run: |
+          if [ -f tools/google-java-format-1.22.0-all-deps.jar ]; then
+            echo "format_jar_exists=true" >> $GITHUB_ENV
+          else
+            echo "format_jar_exists=false" >> $GITHUB_ENV
+          fi
+
       - name: Download Google Java Format JAR
-        if: env.skip == 'false' && ! -f tools/google-java-format-1.22.0-all-deps.jar
+        if: env.skip == 'false' && env.format_jar_exists == 'false'
         run: |
           curl -L -o tools/google-java-format-1.22.0-all-deps.jar https://repo1.maven.org/maven2/com/google/googlejavaformat/google-java-format/1.22.0/google-java-format-1.22.0-all-deps.jar
 
