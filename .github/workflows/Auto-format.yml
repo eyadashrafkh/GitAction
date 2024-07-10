@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  Format:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,11 +20,26 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Run formatting script
-        run: ./format-changed-lines.sh
+      - name: Find changed Java files
+        id: get_changed_files
+        run: |
+          CHANGED_FILES=$(git diff --name-only --diff-filter=d HEAD^ | grep '\.java$' || true)
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          echo "$CHANGED_FILES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+      - name: Format Java files
+        run: |
+          if [ -n "$CHANGED_FILES" ]; then
+            for FILE in $CHANGED_FILES; do
+              java -jar google-java-format-1.22.0-all-deps.jar --aosp --replace "$FILE"
+            done
+          else
+            echo "No Java files changed"
+          fi
 
       - name: Commit and push changes
-        if: success()
+        if: success() && steps.get_changed_files.outputs.CHANGED_FILES != ''
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
