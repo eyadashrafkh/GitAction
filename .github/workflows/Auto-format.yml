@@ -20,32 +20,16 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Check for Java files
-        id: check_java_files
-        run: |
-          if [ -z "$(find . -name '*.java')" ]; then
-            echo "No Java files found."
-            echo "skip=true" >> $GITHUB_ENV
-          else
-            echo "Java files found."
-            echo "skip=false" >> $GITHUB_ENV
-          fi
-
-      - name: Format Java code
-        if: env.skip == 'false'
-        run: java -jar tools/google-java-format-1.22.0-all-deps.jar -r $(find . -name '*.java')
+      - name: Run formatting script
+        run: ./format-changed-lines.sh
 
       - name: Commit and push changes
-        if: env.skip == 'false'
+        if: success()
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m 'Automatically format Java code'
+          git commit -m 'Automatically format changed lines in Java code'
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Skip message
-        if: env.skip == 'true'
-        run: echo "No Java files to format. Action skipped."
