@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  Format:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +20,18 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
+      - name: Download Google Java Format
+        run: |
+          curl -LJO https://github.com/google/google-java-format/releases/download/v1.22.0/google-java-format-1.22.0-all-deps.jar
+
       - name: Find changed Java files
         id: get_changed_files
         run: |
-          CHANGED_FILES=$(git diff --name-only --diff-filter=d HEAD^ | grep '\.java$' || true)
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '\.java$' || true)
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.java$' || true)
+          fi
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
           echo "$CHANGED_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -39,7 +47,7 @@ jobs:
           fi
 
       - name: Commit and push changes
-        if: success() && steps.get_changed_files.outputs.CHANGED_FILES != ''
+        if: success() && env.CHANGED_FILES != ''
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
