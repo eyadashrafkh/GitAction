@@ -1,56 +1,41 @@
 name: Format Java Code
 
-on:
+on: 
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'feature/*'
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  Format:
+  format:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
           java-version: '11'
+          distribution: 'adopt'
 
-      - name: Find changed Java files
-        id: get_changed_files
+      - name: Format Java code
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '\.java$' || true)
-          elif [ "${{ github.event_name }}" == "push" ]; then
-            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.java$' || true)
-          else
-            CHANGED_FILES=""
-          fi
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          echo "$CHANGED_FILES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          find . -name "*.java" -print0 | xargs -0 java -jar /usr/local/bin/google-java-format.jar --replace
 
-      - name: Format Java files
-        run: |
-          if [ -n "$CHANGED_FILES" ]; then
-            for FILE in $CHANGED_FILES; do
-              java -jar google-java-format-1.22.0-all-deps.jar --aosp --replace "$FILE"
-            done
-          else
-            echo "No Java files changed"
-          fi
-
-      - name: Commit and push changes
-        if: success() && env.CHANGED_FILES != ''
+      - name: Commit changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m 'Automatically format changed lines in Java code'
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git commit -m "Format code with Google Java Format" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:${{ github.ref }}
+          # In case of pull request, use the following line instead
+          # git push origin HEAD:refs/heads/${{ github.head_ref }}
