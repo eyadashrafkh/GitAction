@@ -20,11 +20,8 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Install Google Java Format
-        run: sudo apt-get install google-java-format
-
       - name: Format Java code
-        run: google-java-format -n $(find . -name '*.java')
+        run: java -jar tools/google-java-format-1.10.0-all-deps.jar -r $(find . -name '*.java')
 
       - name: Commit and push changes
         run: |
