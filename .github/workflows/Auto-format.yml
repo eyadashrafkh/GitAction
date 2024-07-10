@@ -21,7 +21,7 @@ jobs:
           java-version: '11'
 
       - name: Format Java code
-        run: java -jar tools/google-java-format-1.10.0-all-deps.jar -r $(find . -name '*.java')
+        run: java -jar tools/google-java-format-1.22.0-all-deps.jar -r $(find . -name '*.java')
 
       - name: Commit and push changes
         run: |
