@@ -55,7 +55,7 @@ jobs:
           CHANGED_FILES=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.java$' || true)
           for FILE in $CHANGED_FILES; do
             echo "Formatting $FILE"
-            java -jar tools/google-java-format-1.22.0-all-deps.jar $FILE
+            java -jar tools/google-java-format-1.22.0-all-deps.jar --aosp $FILE
           done
 
       - name: Commit and push changes
