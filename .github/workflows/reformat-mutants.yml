@@ -1,0 +1,42 @@
+name: Format and Create PR
+
+on:
+  push:
+    branches:
+      - main # Which branch trigger the action
+  pull_request:
+    branches:
+      - main # Which branch trigger the action
+
+jobs:
+  format-and-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'  # Change to your required Java version
+          cache: 'maven' # Removable
+
+      - name: Configure git # Commit must have name and email to prevent error
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+    
+      - name: Fetch all branches # Make sure repo has up-to-date information about all branches
+        run: git fetch --all
+
+      - name: Run format and PR script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication
+          GITHUB_USER: ${{ github.repository_owner }}
+        run: |
+          chmod +x format_and_pr.sh
+          ./format_and_pr.sh $GITHUB_TOKEN $GITHUB_USER
+
+      - name: Checkout main branch
+        run: git checkout main
