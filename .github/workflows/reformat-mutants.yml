@@ -34,9 +34,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication
           GITHUB_USER: ${{ github.repository_owner }}
+        # script to be added
         run: |
           chmod +x format_and_pr.sh
-          ./format_and_pr.sh $GITHUB_TOKEN $GITHUB_USER
-
+          ./format_and_pr.sh $GITHUB_TOKEN $GITHUB_USER 
+      
       - name: Checkout main branch
         run: git checkout main
